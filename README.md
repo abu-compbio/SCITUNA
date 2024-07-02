@@ -40,11 +40,6 @@ Below are the steps to obtain the results in the paper.
 ``python -m ipykernel install --user --name scituna --display-name "SCITUNA"``
 
 
-### Notebooks
-To run SCITUNA, please refer to the notebook: run_scituna.ipynb
-To evaluate the output of the methods, please refer to the notebook: evaluation_metrics.ipynb
-To analyze the results: please refer to: metric_score_analysis.ipynb
-
 ### Get Datasets
 
 To download the employed datasets, follow these steps:
