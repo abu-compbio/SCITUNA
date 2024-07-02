@@ -57,7 +57,7 @@ To download the employed datasets, follow these steps:
 Example usage:
 ```bash
 python get_data.py pancreas
-
+```
 ### Run SCITUNA
 
 To run SCITUNA, follow the steps provided in the Jupyter notebook `run_scituna.ipynb`.
