@@ -40,7 +40,7 @@ Below are the steps to obtain the results in the paper.
 ``python -m ipykernel install --user --name scituna --display-name "SCITUNA"``
 
 6. Install scIB package.
-``pip scib``
+``pip install scib``
 
 
 ### Get Datasets
