@@ -39,6 +39,9 @@ Below are the steps to obtain the results in the paper.
 6. Adding _ipykernel_ to this new environment named _SCITUNA_.
 ``python -m ipykernel install --user --name scituna --display-name "SCITUNA"``
 
+6. Install scIB package.
+``pip scib``
+
 
 ### Get Datasets
 
