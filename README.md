@@ -69,12 +69,4 @@ To run SCITUNA, follow the steps provided in the Jupyter notebook `run_scituna.i
 
 To run the analysis and evaluation metrics, follow the steps provided in the Jupyter notebooks `evaluation_metrics.ipynb` and `metric_score_analysis.ipynb`.
 
-### Citation
 
-If you find **SCITUNA** useful for your research, please consider citing the following paper:
-
-> XXX.
-
-```
-XX
-```
