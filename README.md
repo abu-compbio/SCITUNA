@@ -73,4 +73,7 @@ To run SCITUNA, follow the steps provided in the Jupyter notebook `run_scituna.i
 
 To run the analysis and evaluation metrics, follow the steps provided in the Jupyter notebooks `evaluation_metrics.ipynb` and `metric_score_analysis.ipynb`.
 
+We provide t-SNE and UMAP plots for a deeper analysis of the results. You can access them through this [Google Drive link](https://drive.google.com/drive/folders/1WnwBQritr3vc0CYv05CyzSkAdJrJzlgc?usp=drive_link).
+
+
 
