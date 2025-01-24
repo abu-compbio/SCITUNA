@@ -1,4 +1,7 @@
 <br/>
+<p align="center">
+    <span style="font-family: 'Courier New', Courier, monospace; font-size: 24px; color: #007ACC;">SCITUNA</span>
+</p>
 <h1 align="center">SCITUNA</h1>
 <h2 align="center">Single-Cell data Integration Tool Using Network Alignment</h2>
 <br/>
