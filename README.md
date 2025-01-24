@@ -9,7 +9,7 @@
 
 <br/>
 <p align="center">
-    <img width="100%" src="https://github.com/abu-compbio/SCITUNA/blob/main/SCITUNA,png" alt="ProtTrans Attention Visualization">
+    <img width="100%" src="https://github.com/abu-compbio/SCITUNA/blob/main/SCITUNA.png" alt="ProtTrans Attention Visualization">
 </p>
 <br/>
 
