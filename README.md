@@ -3,7 +3,7 @@
 <h2 align="center">Single Cell RNA-seq data integration tool using network alignment</h2>
 <br/>
 
-[SCITUNA](https://github.com/abu-compbio/SCITUNA/) s a Single-Cell RNA-seq datasets Integration Tool Using Network Alignment with batch effect correction. Our method aligns pairs of cells from two batches and uses an iterative approach to refine the integration of each cell based on its nearest neighboring cells.
+[SCITUNA](https://github.com/abu-compbio/SCITUNA/):   Single-Cell RNA-seq datasets Integration Tool Using Network Alignment with batch effect correction. Our method aligns pairs of cells from two batches and uses an iterative approach to refine the integration of each cell based on its nearest neighboring cells.
 
 #For more information, please refer to the article which can be found at [here]([xx](https://github.com/abu-compbio/SCITUNA/)).
 
