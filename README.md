@@ -10,7 +10,7 @@
 <br/>
 <p align="center">
     <img width="100%" src="https://github.com/abu-compbio/SCITUNA/blob/main/SCITUNA.png" alt="ProtTrans Attention Visualization">
-    <p>_The five main stages of the SCITUNA workflow: a) preprocessing and normalization, b) dimensionality reduction and clustering,  c) construction of intra-graphs and the inter-graph, d) anchor selection, e) integration, and f) visualization of the integration results._<\p>
+    _The five main stages of the SCITUNA workflow: a) preprocessing and normalization, b) dimensionality reduction and clustering,  c) construction of intra-graphs and the inter-graph, d) anchor selection, e) integration, and f) visualization of the integration results._
 </p>
 <br/>
 
