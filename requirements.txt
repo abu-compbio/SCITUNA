@@ -12,3 +12,5 @@ ipython
 sklearn
 rpy2
 umap-learn
+scib
+POT
