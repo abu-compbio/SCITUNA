@@ -30,7 +30,7 @@ To download the employed datasets, follow these steps:
     cd data
     ```
 
-2. Run the script to download the dataset. The `dataset` argument can be either `pancreas` or `lung`:
+2. Run the script to download the dataset. The `dataset` argument can be either `pancreas`, `lung`, `small_atac_peaks` or `small_atac_windows`:
     ```bash
     python get_data.py [dataset]
     ```
