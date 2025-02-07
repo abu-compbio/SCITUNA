@@ -22,10 +22,7 @@ import sys
 warnings.filterwarnings("ignore")
 from concurrent.futures import ThreadPoolExecutor, as_completed
 
-
 def main(args):
-
-
     #load dataset
     print("Load dataset...")
     try:
@@ -42,8 +39,8 @@ def main(args):
     def init():
         scituna.reduce_dimensions(pca_dims=100)
         scituna.inter_intra_similarities()
+        scituna.clustering(kc=15)
         scituna.construct_edges()
-        scituna.clustering(kc=30)
 
     def anchors():
         scituna.anchors_selection()

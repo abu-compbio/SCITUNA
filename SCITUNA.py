@@ -1,5 +1,4 @@
 import gc
-import time
 import math
 import warnings
 import numpy as np
@@ -7,7 +6,6 @@ import pandas as pd
 import networkx as nx
 import sys
 from rpy2 import robjects
-from tqdm import tqdm as tqdm
 from collections import Counter
 from sklearn.cluster import KMeans
 from memory_profiler import profile
@@ -28,7 +26,6 @@ class SCITUNA:
                  k_neighbors=None,
                  beta=0.5,
                  max_iterations=10000):
-
         self.beta = beta
         self.adata = adata
         self.batch_key = batch_key
@@ -52,9 +49,7 @@ class SCITUNA:
         self.batch_ids = pd.DataFrame(np.concatenate([self.adata[self.D_q.index].obs[[self.batch_key]],
                                                       self.adata[self.D_r.index].obs[[self.batch_key]]]))[0]
 
-
     def reduce_dimensions(self, pca_dims=100):
-        s = time.time()
         print("\tDimensionality Red.")
 
         if len(self.gene_ids) > pca_dims:
@@ -70,39 +65,28 @@ class SCITUNA:
                 f"must be greater than or equal to the number of components chosen for PCA ({pca_dims})."
             )
 
-
     def inter_intra_similarities(self):
-        s = time.time()
         print("\tInter-Similarities. ")
         self.compute_inter_similarities()
-        e = time.time()
 
-        s = time.time()
         print("\tIntra-Similarities.")
         self.compute_intra_similarities()
-        e = time.time()
-
 
     def compute_inter_similarities(self):
         self.q_nodes = ['q_' + str(i) for i in list(range(self.D_q.shape[0]))]
         self.r_nodes = ['r_' + str(i) for i in list(range(self.D_r.shape[0]))]
         self.inter_dists = euclidean_distances(self.S_qr[:len(self.D_q)], self.S_qr[len(self.D_q):])
 
-
     def compute_intra_similarities(self, fresh=False):
-
         self.query_intra_dist = euclidean_distances(self.S_q, self.S_q)
         self.ref_intra_dist =   euclidean_distances(self.S_r, self.S_r)
-
-
         self.ref_intra_corr =   1. - cdist(self.S_r, self.S_r, metric='correlation')
         self.query_intra_corr = 1. - cdist(self.S_q, self.S_q, metric='correlation')
         # self.ref_intra_corr =   np.corrcoef(self.S_r)
         # self.query_intra_corr = np.corrcoef(self.S_q)
 
-
     def construct_edges(self):
-        s = time.time()
+
         self.ref_intra_corr[np.tril_indices_from(self.ref_intra_corr)] = -2.0
         self.query_intra_corr[np.tril_indices_from(self.query_intra_corr)] = -2.0
 
@@ -111,29 +95,31 @@ class SCITUNA:
 
         self.r_min_dist = np.min(self.ref_intra_dist[~np.eye(self.ref_intra_dist.shape[0], dtype=bool)])
         self.q_min_dist = np.min(self.query_intra_dist[~np.eye(self.query_intra_dist.shape[0], dtype=bool)])
-        e = time.time()
 
         # self.ref_intra_dist = np.triu(self.ref_intra_dist)
         # self.query_intra_dist = np.triu(self.query_intra_dist)
 
-        ref_comb_count = int((len(self.q_nodes) ** 2 - len(self.q_nodes)) / 2)
-        self.q_edges = [(math.floor(x / len(self.q_nodes)), x % len(self.q_nodes)) for x in
-                        np.argsort(-self.query_intra_corr, axis=None)]
-        self.q_edges = self.q_edges[:ref_comb_count]
+        p_q = 100 * max(20, min(list(Counter(self.qkm.labels_).values()))) / len(self.q_nodes)
+        p_r = 100 * max(20, min(list(Counter(self.rkm.labels_).values()))) / len(self.r_nodes)
+        if p_q > 1.5 * p_r:
+            p_q /= len(np.unique(self.qkm.labels_))
+        self.M_q = int(np.ceil(p_q / 100 * (int((len(self.q_nodes) ** 2 - len(self.q_nodes)) / 2))))
+        self.M_r = int(np.ceil(p_r / 100 * (int((len(self.r_nodes) ** 2 - len(self.r_nodes)) / 2))))
 
+        # Query
+        triu_rows, triu_cols = np.triu_indices(self.query_intra_corr.shape[0], k=1)
+        top_k_indices = np.argpartition(-self.query_intra_corr[triu_rows, triu_cols], self.M_q)[:self.M_q]
+        sorted_order = np.argsort(-self.query_intra_corr[triu_rows, triu_cols][top_k_indices])
+        self.q_edges = np.vstack((triu_rows[top_k_indices][sorted_order], triu_cols[top_k_indices][sorted_order])).T
 
-        tar_comb_count = int((len(self.r_nodes) ** 2 - len(self.r_nodes)) / 2)
-        self.r_edges = [(math.floor(x / len(self.r_nodes)), x % len(self.r_nodes)) for x in
-                        np.argsort(-self.ref_intra_corr, axis=None)]
-        self.r_edges = self.r_edges[:tar_comb_count]
-
-        del self.query_intra_corr, self.ref_intra_corr, tar_comb_count, ref_comb_count
-        gc.collect()
+        # Reference
+        triu_rows, triu_cols = np.triu_indices(self.ref_intra_corr.shape[0], k=1)
+        top_k_indices = np.argpartition(-self.ref_intra_corr[triu_rows, triu_cols], self.M_r)[:self.M_r]
+        sorted_order = np.argsort(-self.ref_intra_corr[triu_rows, triu_cols][top_k_indices])
+        self.r_edges = np.vstack((triu_rows[top_k_indices][sorted_order], triu_cols[top_k_indices][sorted_order])).T
 
 
     def clustering(self, kc=30):
-
-        s = time.time()
         print("\tClustering.")
         K = range(2, kc)
         def query_kmeans(k):
@@ -168,7 +154,6 @@ class SCITUNA:
             self.rkm.append(kmeans)
             ref_silhouette_scores.append(score)
         self.rkm = self.rkm[np.argmax(ref_silhouette_scores) + 2]
-        e = time.time()
 
         del self.S_qr, self.S_r, self.S_q
         gc.collect()
@@ -183,14 +168,10 @@ class SCITUNA:
         self.Gq.add_nodes_from(self.q_nodes)  # add nodes
         self.Gr.add_nodes_from(self.r_nodes)  # add nodes
 
-        p_q = 100 * max(20, min(list(Counter(self.qkm.labels_).values()))) / len(self.q_nodes)
-        p_r = 100 * max(20, min(list(Counter(self.rkm.labels_).values()))) / len(self.r_nodes)
-        if p_q > 1.5 * p_r:
-            p_q /= len(np.unique(self.qkm.labels_))
-        s = time.time()
+
         print("\t\tBuild Gq")
         # Query
-        M = int(np.ceil(p_q / 100 * len(self.q_edges)))
+        M = self.M_q
         S = int(skip / 100 * M) + 1
         for (i, j) in self.q_edges[:S]:
             dst = ((self.query_intra_dist[i, j] - self.q_min_dist) /
@@ -204,13 +185,12 @@ class SCITUNA:
                        (self.q_max_dist - self.q_min_dist))
                 self.Gq.add_edge('q_' + str(i), 'q_' + str(j), dist=dst)  # add a->b
                 self.Gq.add_edge('q_' + str(j), 'q_' + str(i), dist=dst)  # add b->a
-        e = time.time()
+        del self.q_edges
+        gc.collect()
 
-
-        s = time.time()
         print("\t\tBuild Gr")
         # Ref
-        M = int(np.ceil(p_r / 100 * len(self.r_edges)))
+        M = self.M_r
         S = int(skip / 100 * M) + 1
         self.rn = set()
         self.re = []
@@ -242,14 +222,10 @@ class SCITUNA:
         degrees = np.bincount(self.re)
         self.min_ref_degree = 2 * np.min(degrees[degrees > 0])
 
-        e = time.time()
 
-        del degrees
+        del degrees, self.r_edges
         gc.collect()
-        s = time.time()
         self.connect_isolated_nodes()
-        e = time.time()
-
 
 
     def connect_isolated_nodes(self):
@@ -257,62 +233,41 @@ class SCITUNA:
                        deg != 0]  # get the degree of nodes in the reference graph
 
         min_query_degree = int(np.min(query_degrees))
-        isolated_nodes = list(nx.isolates(self.Gq)).copy()  # list of all isolated nodes
-        isolated_nodes_ = {int(i[2:]): min_query_degree for i in isolated_nodes}
-        while isolated_nodes_:
-            for edge in tqdm(self.q_edges):
-                if edge[0] in isolated_nodes_ and isolated_nodes_[edge[0]] != 0:
-                    dst = ((self.query_intra_dist[edge[0], edge[1]] - self.q_min_dist) /
-                           (self.q_max_dist - self.q_min_dist))  # normalize the distance
-                    self.Gq.add_edge('q_' + str(edge[0]), 'q_' + str(edge[1]), dist=dst)
-                    isolated_nodes_[edge[0]] -= 1
-                    if isolated_nodes_[edge[0]] == 0:
-                        isolated_nodes_.pop(edge[0])
+        isolated_nodes = [int(i[2:]) for i in list(nx.isolates(self.Gq))]
+        for k in isolated_nodes:
+            row_values = [(k, j, -self.query_intra_corr[k, j]) for j in range(k+1,len(self.query_intra_corr))]
+            col_values = [(k, i, -self.query_intra_corr[i, k]) for i in range(k)]
+            edges = sorted(row_values + col_values, key=lambda x: x[2])[:min_query_degree]
+            for edge in edges:
+                dst = ((self.query_intra_dist[edge[0], edge[1]] - self.q_min_dist) /
+                                       (self.q_max_dist - self.q_min_dist))
+                self.Gq.add_edge('q_' + str(edge[0]), 'q_' + str(edge[1]), dist=dst)
 
-                if edge[1] in isolated_nodes_ and isolated_nodes_[edge[1]] != 0:
-                    dst = ((self.query_intra_dist[edge[0], edge[1]] - self.q_min_dist) /
-                           (self.q_max_dist - self.q_min_dist))  # normalize the distance
-                    self.Gq.add_edge('q_' + str(edge[1]), 'q_' + str(edge[0]), dist=dst)
-                    isolated_nodes_[edge[1]] -= 1
-                    if isolated_nodes_[edge[1]] == 0:
-                        isolated_nodes_.pop(edge[1])
-        del isolated_nodes, isolated_nodes_
+
+        del self.query_intra_corr
         gc.collect()
 
-        # print(self.min_ref_degree)
         isolated_nodes = list(nx.isolates(self.Gr)).copy()  # list all isolated nodes
-        isolated_nodes_ = {int(i[2:]): self.min_ref_degree
-                           for i in isolated_nodes
+        self.re = np.unique(self.re)
+        isolated_nodes = [int(i[2:]) for i in list(nx.isolates(self.Gr))
                            if int(i[2:]) not in self.re
                            and int(i[2:]) in self.matched_ref
-                           }
+                           ]
 
-        del self.re, self.matched_ref
-        gc.collect()
-        while isolated_nodes_:
-            for edge in tqdm(self.r_edges):
-                if edge[0] in isolated_nodes_ and isolated_nodes_[edge[0]] != 0:
-                    dst = (self.ref_intra_dist[edge[0], edge[1]] - self.r_min_dist) / (
-                            self.r_max_dist - self.r_min_dist)  # normalize the distance
-                    self.Gr.add_edge('r_' + str(edge[0]), 'r_' + str(edge[1]), dist=dst)
-                    isolated_nodes_[edge[0]] -= 1
-                    if isolated_nodes_[edge[0]] == 0:
-                        isolated_nodes_.pop(edge[0])
-
-                if edge[1] in isolated_nodes_ and isolated_nodes_[edge[1]] != 0:
-                    dst = (self.ref_intra_dist[edge[0], edge[1]] - self.r_min_dist) / (
-                            self.r_max_dist - self.r_min_dist)  # normalize the distance
-                    self.Gr.add_edge('r_' + str(edge[1]), 'r_' + str(edge[0]), dist=dst)
-                    isolated_nodes_[edge[1]] -= 1
-                    if isolated_nodes_[edge[1]] == 0:
-                        isolated_nodes_.pop(edge[1])
-        del isolated_nodes, isolated_nodes_
+        for k in isolated_nodes:
+            row_values = [(k, j, -self.ref_intra_corr[k, j]) for j in range(k+1, len(self.ref_intra_corr))]
+            col_values = [(k, i, -self.ref_intra_corr[i, k]) for i in range(k)]
+            edges = sorted(row_values + col_values, key=lambda x: x[2])[:self.min_ref_degree]
+            for edge in edges:
+                dst = ((self.ref_intra_dist[edge[0], edge[1]] - self.r_min_dist) /
+                                     (self.r_max_dist - self.r_min_dist))
+                self.Gr.add_edge('r_' + str(edge[0]), 'r_' + str(edge[1]), dist=dst)
+        del self.ref_intra_corr
         gc.collect()
 
 
     def anchors_selection(self):
 
-        s = time.time()
         print("\tAnchors Selection")
 
         pandas2ri.activate()
@@ -360,17 +315,15 @@ class SCITUNA:
 
         anchors_dataframe.sort_values("dists", inplace = True)
 
-        self.XX = anchors_dataframe.copy()
+        self.anchors_ = anchors_dataframe.copy()
         self.query_ref_matchings = {}
         self.matched_ref = set()
-        for i in np.unique(self.XX.cell1):
-            self.query_ref_matchings[i] = int(self.XX[self.XX.cell1 == i].values[0][1])
+        for i in np.unique(self.anchors_.cell1):
+            self.query_ref_matchings[i] = int(self.anchors_[self.anchors_.cell1 == i].values[0][1])
             self.matched_ref.add(self.query_ref_matchings[i])
-        e = time.time()
 
 
     def integrate_datasets(self):
-        s = time.time()
         print("\tIntegration...")
         self.min_inter = np.min(self.inter_dists)
         self.max_inter = np.max(self.inter_dists)
@@ -391,14 +344,14 @@ class SCITUNA:
         self.k_neighbors = max(20, min(30, min(list(Counter(self.qkm.labels_).values())) - 1))
 
 
-        for i in tqdm(range(self.D_q.shape[0])):
+        for i in range(self.D_q.shape[0]):
             self.q_neighbors_wa[i], self.q_neighbors_dists_wa[i], self.a_a_dists[i], \
                 self.q_a_dists[i], self.q_neighbors_woa[i], self.q_neighbors_dists_woa[
                 i] = self.initializations("q_" + str(i))
         del self.Gq, self.Gr
         gc.collect()
 
-        for i in tqdm(range(self.D_q.shape[0])):
+        for i in range(self.D_q.shape[0]):
             self.build_int_vectors(i)
 
         self.prev_int_vectors = np.array(self.int_vectors)
@@ -416,9 +369,6 @@ class SCITUNA:
             self.diff.append(np.sum(self.curr_int_vectors))
             self.prev_int_vectors = np.copy(self.curr_int_vectors)
         self.correct_query_dataset()
-        e = time.time()
-
-
 
     def initializations(self, qi):
 

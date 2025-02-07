@@ -6,18 +6,11 @@ import warnings
 import psutil
 import anndata
 import argparse
-import threading
 import subprocess
 import numpy as np
-import pandas as pd
 from utils import *
-import h5py
 import sys
-import resource
-
-
 warnings.filterwarnings("ignore")
-from concurrent.futures import ThreadPoolExecutor, as_completed
 
 def multi_batch_int(dataset, args):
 
@@ -43,7 +36,6 @@ def multi_batch_int(dataset, args):
         file_path = f"{args.o}/{args.i}/MBI/SCITUNA_[{batch1}]_[{batch2}].h5ad"
         if os.path.isfile(file_path):
             data_i = scanpy.read_h5ad(file_path)
-
         else:
 
             data_i = current_adata[current_adata.obs[args.b].isin((batch1, batch2))]
@@ -63,7 +55,6 @@ def multi_batch_int(dataset, args):
             ]
             process = subprocess.Popen(cmd)
             ps_proc = psutil.Process(process.pid)
-
 
             process.wait()  # Blocks execution until the process is done
 
@@ -87,6 +78,9 @@ def multi_batch_int(dataset, args):
                         print(f"Freed memory from process {proc.info['name']} (PID {process.pid})")
 
             free_up_memory()
+            if os.path.exists(ifile_path):
+                os.remove(ifile_path)
+
             data_i = scanpy.read_h5ad(file_path)
         current_adata = current_adata[current_adata.obs[args.b] != batch1]
         current_adata = current_adata[current_adata.obs[args.b] != batch2]
@@ -130,11 +124,7 @@ def main(args):
             f"Invalid Batch ID."
         )
 
-    #retreive batch pairs as tuples
-    paired_batches = [(a, b) for i, a in enumerate(np.unique(original_dataset.obs[args.b])) for
-                   b in np.unique(original_dataset.obs[args.b])[i + 1:]]
-
-    print("There are :", len(paired_batches), " batch pairs.")
+    
     multi_batch_int(original_dataset, args)
 
 
