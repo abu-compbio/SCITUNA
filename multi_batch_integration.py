@@ -58,7 +58,8 @@ def multi_batch_int(dataset, args):
                 "--f", ifile_path,
                 "--b", args.b,
                 "--o", args.o,
-                "--c", str(args.c)  # Ensure numeric values are converted to strings
+                "--c", str(args.c),
+                "--t", "MBI"
             ]
             process = subprocess.Popen(cmd)
             ps_proc = psutil.Process(process.pid)
