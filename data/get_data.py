@@ -3,7 +3,9 @@ import requests
 import os
 
 datasets =  {"pancreas":"https://figshare.com/ndownloader/files/24539828",
-             "lung":"https://figshare.com/ndownloader/files/24539942"}
+             "lung":"https://figshare.com/ndownloader/files/24539942",
+             "small_atac_peaks":"https://figshare.com/ndownloader/files/25721792",
+             "small_atac_windows":"https://figshare.com/ndownloader/files/25721795"}
 
 def download_dataset(dataset_name):
     if dataset_name not in datasets:
