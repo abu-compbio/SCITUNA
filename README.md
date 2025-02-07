@@ -17,34 +17,8 @@
 </p>
 <br/>
 
-## Reproducibility
+## Run SCITUNA
 Below are the steps to obtain the results in the paper.
-
-### Preparing the _SCITUNA_ environment
-1. Download the repository.
-
-
-2. Update the conda base\
-``conda update conda -n base -y``
-
-
-3. _conda-forge_ needs to be added for installations of packages.
-``conda config --append channels conda-forge``
-
-
-4. Create a new environment named _scituna_ with a specified Python version and install required packages.\
-``conda create python=4.0.6 --name scituna --file requirements.txt -y``
-
-
-5. Activate new environment.\
-``conda activate scituna``
-
-
-6. Adding _ipykernel_ to this new environment named _SCITUNA_.
-``python -m ipykernel install --user --name scituna --display-name "SCITUNA"``
-
-6. Install scIB package.
-``pip install scib``
 
 
 ### Get Datasets
@@ -65,13 +39,30 @@ Example usage:
 ```bash
 python get_data.py pancreas
 ```
-### Run SCITUNA
+### Multi-batch Integrations
 
-To run SCITUNA, follow the steps provided in the Jupyter notebook `run_scituna.ipynb`.
+To integrate multiple batches using **SCITUNA**, run the following command:  
 
-### Analysis
+ ```bash
+python multi_batch_integration.py --i [input_dataset] --b [batch_id] --c [num_cores]
+ ```
+ **Arguments**
+ 
+--i (input_dataset): The dataset file located in **"data/"** (supported formats: H5AD).
 
-To run the analysis and evaluation metrics, follow the steps provided in the Jupyter notebooks `evaluation_metrics.ipynb` and `metric_score_analysis.ipynb`.
+--b (batch_id): The column name in **".obs"** that indicates batch labels for integration.
+
+--c (num_cores): Number of CPU cores to use for parallel processing.
+
+
+### Pairwise Integrations
+
+To perform **pairwise batch integration** using **SCITUNA**, run the following command:  
+
+ ```bash
+python pairwise_integration.py --i [input_dataset] --b [batch_id] --c [num_cores]
+ ```
+ 
 
 We provide t-SNE and UMAP plots for a deeper analysis of the results. You can access them through this [Google Drive link](https://drive.google.com/drive/folders/1WnwBQritr3vc0CYv05CyzSkAdJrJzlgc?usp=drive_link).
 
