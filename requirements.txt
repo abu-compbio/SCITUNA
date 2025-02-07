@@ -9,8 +9,8 @@ jupyterlab
 ipywidgets
 networkx
 ipython
-sklearn
+sklearn == 1.02
 rpy2
 umap-learn
 scib
-POT
+POT == 0.9.4
