@@ -15,6 +15,57 @@ import matplotlib.pyplot as plt
 from collections import Counter
 from matplotlib.gridspec import GridSpec
 from sklearn.metrics.pairwise import cosine_similarity
+import pyfiglet
+from ot import emd2
+from scipy.spatial.distance import cdist
+from multiprocessing import Pool, Manager
+from sklearn.decomposition import PCA
+
+import warnings
+warnings.filterwarnings("ignore")
+
+def OTC(data1, data2):
+    Ui = np.ones(data1.shape[0]) / data1.shape[0]
+    Uj = np.ones(data2.shape[0]) / data2.shape[0]
+    CMij = cdist(data1, data2, metric='euclidean')
+    otc = emd2(Ui, Uj, CMij)
+    return otc
+
+def process_pair(pair, datasets_pca, otcs):
+    if pair in otcs:
+        return
+    otcs[pair] = OTC(datasets_pca[pair[0]], datasets_pca[pair[1]])
+
+def parallel_otcs(paired_batches, datasets_pca):
+    with Manager() as manager:
+        otcs = manager.dict()  # Shared dictionary
+        with Pool() as pool:
+            list(tqdm(pool.starmap(process_pair, [(pair, datasets_pca, otcs) for pair in paired_batches]),
+                      total=len(paired_batches)))
+        return dict(otcs)  # Convert back to a regular dictionary
+
+def score_batches_parallal(anndata, otcs, datasets_pca, args):
+    paired_batches = [(a, b) for i, a in enumerate(np.unique(anndata.obs[args.b])) for
+                      b in np.unique(anndata.obs[args.b])[i + 1:]]
+    otcs = parallel_otcs(paired_batches, datasets_pca)
+    sorted(otcs.items(), key=lambda x: x[1], reverse=False)
+    return sorted(otcs.items(), key=lambda x: x[1], reverse=False)[0][0], otcs
+
+def header():
+    print(pyfiglet.figlet_format("SCITUNA v1.0"))
+
+def task_box(pair):
+    s_style = f"Integrating: {pair[0]} and {pair[1]}"
+    box_width = len(s_style) + 6  # Add extra space for padding
+    top_bottom_border = "╔" + "═" * (box_width - 2) + "╗"  # Top border
+    middle_border = "║" + " " * (box_width - 2) + "║"  # Side borders
+    bottom_border = "╚" + "═" * (box_width - 2) + "╝"  # Bottom border
+
+    print(top_bottom_border)
+    print(middle_border)
+    print(f"║  {s_style}  ║")  # Center the text with padding
+    print(middle_border)
+    print(bottom_border)
 
 def load_and_combine_scores(outputs_folder, methods, datasets):
     methods_vs_metrics = {}
