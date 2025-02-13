@@ -1,6 +1,6 @@
 <br/>
 <h1 align="center">SCITUNA</h1>
-<h2 align="center">Single-Cell data Integration Tool Using Network Alignment</h2>
+<h2 align="center">**S**ingle-**C**ell data **I**ntegration **T**ool **U**sing **N**etwork **A**lignment</h2>
 <br/>
 
 [SCITUNA](https://github.com/abu-compbio/SCITUNA/): a novel single-cell data integration approach that combines both _graph-based_ and _anchor-based_ techniques. SCITUNA constructs a graph for each batch to represent intra-batch cell similarities, and a bipartite graph to capture inter-batch similarities. This transforms the integration problem into a many-to-one matching problem, where cells from a query batch are matched with cells from a reference batch. The resulting matches are then used to transform the query cell space to the reference cell space.
