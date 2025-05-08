@@ -68,3 +68,42 @@ We provide t-SNE and UMAP plots for a deeper analysis of the results. You can ac
 
 
 
+## Install SCITUNA
+These steps will help you set up the SCITUNA environment and install the necessary dependencies in both Python and R.
+
+
+
+#### 1. Create a virtual environment
+To ensure reproducibility and avoid conflicts with other packages, it is recommended to use a separate Conda environment for SCITUNA.
+
+```bat
+conda create -n SCITUNA python=3.10
+conda activate SCITUNA
+```
+This creates and activates a new environment named SCITUNA with Python 3.10. You can choose a different version if needed, but compatibility with required packages is tested for Python 3.10.
+
+#### 2. Install Python Dependencies
+Once the environment is active, install the required Python packages listed in requirements.txt using pip.
+
+Make sure requirements.txt is in your current directory.
+
+```bat
+pip install -r requirements.txt
+```
+
+
+#### 3. Install Seurat in R
+SCITUNA also leverages functionality from the R package Seurat.
+
+##### Launch R in the same Conda environment:
+```bat
+R
+```
+
+##### Once inside the R console, run the following command:
+
+
+```bat
+remotes::install_version("Seurat", version = "3.1.1")
+```
+
