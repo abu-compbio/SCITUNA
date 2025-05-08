@@ -13,7 +13,7 @@ def download_dataset(dataset_name):
         return
 
     url = datasets[dataset_name]
-    filename = os.path.basename("{}_unintegrated.h5ad".format(dataset_name))
+    filename = os.path.basename("{}.h5ad".format(dataset_name))
     
     # Download the dataset
     response = requests.get(url)
