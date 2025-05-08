@@ -8,7 +8,7 @@
 - SCITUNA operates directly in the original gene expression space.
 - The method introduces a novel batch ordering strategy based on optimal transport cost.
 
-#For more information, please refer to the article which can be found at [here]([xx](https://github.com/abu-compbio/SCITUNA/)).
+#For more information, please refer to our article: https://doi.org/10.1186/s12859-025-06087-3
 
 <br/>
 <p align="center">
