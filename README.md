@@ -64,7 +64,6 @@ python pairwise_integration.py --i [input_dataset] --b [batch_id] --c [num_cores
  ```
  
 
-We provide t-SNE and UMAP plots for a deeper analysis of the results. You can access them through this [Google Drive link](https://drive.google.com/drive/folders/1WnwBQritr3vc0CYv05CyzSkAdJrJzlgc?usp=drive_link).
 
 
 
@@ -107,3 +106,9 @@ R
 remotes::install_version("Seurat", version = "3.1.1")
 ```
 
+## Additional data
+We provide t-SNE and UMAP plots for a deeper analysis of the results. You can access them through this [Google Drive link](https://drive.google.com/drive/folders/1WnwBQritr3vc0CYv05CyzSkAdJrJzlgc?usp=drive_link).
+
+
+## Citation
+Houdjedj, A., Marouf, Y., Myradov, M. et al. SCITUNA: single-cell data integration tool using network alignment. BMC Bioinformatics 26, 92 (2025). https://doi.org/10.1186/s12859-025-06087-3
