@@ -85,7 +85,7 @@ def main(args):
     #load dataset
     print("Load dataset...")
     try:
-        original_dataset = scanpy.read_h5ad("data/{}_unintegrated.h5ad".format(args.i))
+        original_dataset = scanpy.read_h5ad("data/{}.h5ad".format(args.i))
     except:
         raise ValueError(
             f"Invalid Dataset."
