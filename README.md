@@ -89,7 +89,10 @@ Make sure requirements.txt is in your current directory.
 ```bat
 pip install -r requirements.txt
 ```
+#### 3. Install Seurat in R
+SCITUNA also leverages functionality from the R package Seurat, which is widely used for single-cell RNA-seq data analysis.
 
+We recommend installing Seurat version 3, as SCITUNA was developed and tested using this version to ensure compatibility and reproducibility.
 
 
 ## Additional data
