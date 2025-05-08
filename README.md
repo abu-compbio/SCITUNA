@@ -91,20 +91,6 @@ pip install -r requirements.txt
 ```
 
 
-#### 3. Install Seurat in R
-SCITUNA also leverages functionality from the R package Seurat.
-
-##### Launch R in the same Conda environment:
-```bat
-R
-```
-
-##### Once inside the R console, run the following command:
-
-
-```bat
-remotes::install_version("Seurat", version = "3.1.1")
-```
 
 ## Additional data
 We provide t-SNE and UMAP plots for a deeper analysis of the results. You can access them through this [Google Drive link](https://drive.google.com/drive/folders/1WnwBQritr3vc0CYv05CyzSkAdJrJzlgc?usp=drive_link).
