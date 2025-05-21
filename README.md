@@ -96,7 +96,6 @@ We recommend installing Seurat version 3, as SCITUNA was developed and tested us
 
 Use Micromamba, a lightweight and super-fast binary version of Mamba (alternative to conda):
 
-Download Micromamba binary
 ```bat
 curl -L https://micro.mamba.pm/api/micromamba/linux-64/latest | tar -xvj bin/micromamba
 ```
