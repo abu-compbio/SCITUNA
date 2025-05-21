@@ -17,12 +17,17 @@ import pandas as pd
 from utils import *
 import h5py
 import sys
+import contextvars
+from concurrent.futures import ThreadPoolExecutor, as_completed
+
+
 
 
 warnings.filterwarnings("ignore")
 from concurrent.futures import ThreadPoolExecutor, as_completed
 
 def main(args):
+    ctx = contextvars.copy_context()
     #load dataset
     print("Load dataset...")
     try:
@@ -39,11 +44,11 @@ def main(args):
     def init():
         scituna.reduce_dimensions(pca_dims=100)
         scituna.inter_intra_similarities()
-        scituna.clustering(kc=15)
+        scituna.clustering(kc=3)
         scituna.construct_edges()
 
     def anchors():
-        scituna.anchors_selection()
+        ctx.run(scituna.anchors_selection)
 
     with ThreadPoolExecutor(max_workers=int(args.c)) as executor:
         tasks = [
