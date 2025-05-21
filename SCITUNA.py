@@ -280,7 +280,11 @@ class SCITUNA:
         r_output = robjects.r(
             '''
             library ("Seurat")
+            library(future)
+            plan("multicore") 
+            options(future.seed = TRUE)
             options(future.globals.maxSize = 10000 * 1024^2)
+            
             seurat_obj <- CreateSeuratObject(t(data))
             seurat_obj <- FindVariableFeatures(seurat_obj, selection.method = "vst", verbose = F,nfeatures = 2000)
 
@@ -291,6 +295,7 @@ class SCITUNA:
             anchors_dataframe <- FindIntegrationAnchors(object.list = data.list,dims = 1:30, verbose = F )
             anchors_dataframe=anchors_dataframe@anchors
             output=list(anchors_dataframe)
+            output
             '''
         )
 
@@ -298,7 +303,8 @@ class SCITUNA:
         del robjects.globalenv['batches']
         gc.collect()
 
-        anchors_dataframe = r_output[0]  # Seurat anchors
+        #anchors_dataframe = r_output[0]  # Seurat anchors
+        anchors_dataframe = pandas2ri.rpy2py(r_output[0])
         anchors_dataframe = anchors_dataframe.astype({'cell1': int,
                                                       'cell2': int})
 
