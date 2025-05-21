@@ -20,3 +20,4 @@ scikit-image
 pyfiglet
 memory-profiler
 holoviews
+requests
