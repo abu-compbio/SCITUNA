@@ -37,7 +37,7 @@ To download the employed datasets, follow these steps:
 
 Example usage:
 ```bash
-python get_data.py pancreas
+python get_data.py human_pancreas
 ```
 ### Multi-batch Integrations
 
