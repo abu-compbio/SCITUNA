@@ -94,6 +94,40 @@ SCITUNA also leverages functionality from the R package Seurat, which is widely 
 
 We recommend installing Seurat version 3, as SCITUNA was developed and tested using this version to ensure compatibility and reproducibility.
 
+Use Micromamba, a lightweight and super-fast binary version of Mamba (alternative to conda):
+
+Download Micromamba binary
+```bat
+curl -L https://micro.mamba.pm/api/micromamba/linux-64/latest | tar -xvj bin/micromamba
+```
+
+Move it to somewhere in your PATH
+```bat
+mv bin/micromamba ~/bin/micromamba   # or /usr/local/bin/micromamba
+```
+
+Add it to PATH (if not already)
+```bat
+export PATH="$HOME/bin:$PATH"
+```
+
+install Rpy2, Seurat and its dependencies
+```bat
+micromamba install -c conda-forge \
+  rpy2 \
+  r-seurat=3.2.3 \
+  r-sctransform=0.3.2 \
+  r-cowplot r-fitdistrplus r-ggplot2 r-ggrepel r-ggridges \
+  r-httr r-igraph r-irlba r-leiden r-mass r-matrix r-miniui \
+  r-patchwork r-plotly r-png r-rann r-rcpp r-rcppannoy \
+  r-reticulate r-rsvd r-rtsne r-scattermore r-shiny r-uwot \
+  r-rcppeigen r-spatstat=1.64_1
+```
+
+
+
+
+
 
 ## Additional data
 We provide t-SNE and UMAP plots for a deeper analysis of the results. You can access them through this [Google Drive link](https://drive.google.com/drive/folders/1WnwBQritr3vc0CYv05CyzSkAdJrJzlgc?usp=drive_link).
