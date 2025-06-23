@@ -44,7 +44,7 @@ def main(args):
     def init():
         scituna.reduce_dimensions(pca_dims=100)
         scituna.inter_intra_similarities()
-        scituna.clustering(kc=3)
+        scituna.clustering(kc=30)
         scituna.construct_edges()
 
     def anchors():
